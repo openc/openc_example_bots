@@ -1,0 +1,9 @@
+{
+ "bot_id": "medium_bot",
+ "source_descriptor": "http://ppda.go.ug/tenderportal/",
+ "data_type": "primary_source",
+ "unique_fields": ["reference_no"],
+ "executable": "medium_scraper.rb",
+ "version": "0.1",
+ "files": ["medium_scraper.rb", "README.md", "Gemfile", "Gemfile.lock"]
+}
