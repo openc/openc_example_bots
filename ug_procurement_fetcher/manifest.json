@@ -1,0 +1,9 @@
+{
+ "bot_id": "ug_procurement_fetcher",
+ "source_descriptor": "http://ppda.go.ug/tenderportal/",
+ "data_type": "primary_source",
+ "unique_fields": ["reference_no"],
+ "executable": "ug_procurement_fetcher.rb",
+ "version": "0.1",
+ "files": ["ug_procurement_fetcher.rb", "README.md", "Gemfile", "Gemfile.lock"]
+}

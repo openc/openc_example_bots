@@ -1,0 +1,11 @@
+/db
+/data
+/tmp
+/db/*
+/data/*
+/tmp/*
+/pids/*
+!.gitkeep
+/db
+/data
+/tmp
