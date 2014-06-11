@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>scraper.rb</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>scraper.rb</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2 id="intro">Intro</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>This bot scrapes procurement data for Uganda from <a href="http://ppda.go.ug/tenderportal/">http://ppda.go.ug/tenderportal/</a></p>
+<h2 id="prerequisites">Prerequisites</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Load any gems you need first. Here we’ll use <code>chronic</code> for date parsing,
+<code>httpclient</code> and <code>nokogiri</code> to fetch and query the html pages and some 
+helper methods from the <code>openc_bot</code> gem maintained by OpenCorporates.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">require</span> <span class="hljs-string">'active_support/core_ext'</span>
+<span class="hljs-keyword">require</span> <span class="hljs-string">'chronic'</span>
+<span class="hljs-keyword">require</span> <span class="hljs-string">'nokogiri'</span>
+<span class="hljs-keyword">require</span> <span class="hljs-string">'httpclient'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>There are a number of helper methods covering text, csv, dates and more.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">require</span> <span class="hljs-string">'openc_bot/helpers/text'</span>
+
+<span class="hljs-constant">BASE_URL</span> = <span class="hljs-string">'http://ppda.go.ug/tenderportal/'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h2 id="fetching-the-data">Fetching the data</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>In this method, we loop through pages of search results breaking the loop
+when we hit “No matches were found”. We’re passing these results pages onto
+the <code>parse_results_page</code> method.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>get_all_notices
+  start_notice = <span class="hljs-number">0</span>
+  loop <span class="hljs-keyword">do</span>
+    url = <span class="hljs-constant">BASE_URL</span> + <span class="hljs-string">"listofawarded-contracts.html?start=<span class="hljs-subst">#{start_notice}</span>"</span>
+    page = <span class="hljs-constant">HTTPClient</span>.new.get_content(url)
+    <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> page[<span class="hljs-regexp">/No matches were found/</span>]
+    results = parse_results_page(page)
+    results.each <span class="hljs-keyword">do</span> |result_hash|</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>We then print the resultant hashes out as JSON.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      puts <span class="hljs-constant">JSON</span>.dump(result_hash)
+    <span class="hljs-keyword">end</span>
+    start_notice += <span class="hljs-number">15</span>
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <h2 id="extracting-the-data">Extracting the data</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>parse_results_page(page)
+  doc = <span class="hljs-constant">Nokogiri::HTML</span>(page)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>In this case the data we want is in an HTML table</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  table_rows = doc.search(<span class="hljs-string">'table#tenderlisttop tr'</span>).to_a.select { |tr| tr.at(<span class="hljs-string">'td'</span>) }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>We take the cells from the first row as headers, normalising them to <code>snake_case</code>. 
+These will be used as hash keys later on.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  headings = table_rows.shift.search(<span class="hljs-string">'td'</span>).collect{ |td| td.inner_text.downcase.gsub(<span class="hljs-regexp">/[^\w\s]/</span>,<span class="hljs-string">''</span>).strip.gsub(<span class="hljs-regexp">/\s/</span>,<span class="hljs-string">'_'</span>) }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>We then work through the rest of the rows, building a <code>key =&gt; value</code> hash based on the column headers.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  results = table_rows.collect <span class="hljs-keyword">do</span> |tr|
+    res = tr.search(<span class="hljs-string">'td'</span>).to_a.each.with_index.inject({}) <span class="hljs-keyword">do</span> |hsh, (td, i)|</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Here we are using helpers from the <a href="https://github.com/openc/openc_bot">OpenCorporates <code>openc_bot</code> gem</a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      hsh[headings[i]] = <span class="hljs-constant">OpencBot::Helpers::Text</span>.strip_all_spaces(td.inner_text)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>The data also contains links to a full text version of the tender notice.
+Here we record that url for future bots to process at a later date.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      hsh[<span class="hljs-string">"<span class="hljs-subst">#{headings[i]}</span>_url"</span>] = (<span class="hljs-constant">BASE_URL</span> + td.at(<span class="hljs-string">'a'</span>)[<span class="hljs-symbol">:href</span>]) <span class="hljs-keyword">if</span> td.at(<span class="hljs-string">'a'</span>)
+      hsh
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <h2 id="running-the-scraper">Running the scraper</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>As this is executed as a single Ruby file, we need to make sure we call some methods!
+We’ll use an old convention from C programming and wrap the work in a main method, which
+is then run straight away.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>main
+  get_all_notices
+<span class="hljs-keyword">end</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Here’s where the magic happens.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>main</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
