@@ -58,7 +58,9 @@ end
 output.each do |row|
   datum = {
     company_name: row[0], 
-    company_number: row[1]
+    company_number: row[1],
+    sample_date: Time.now.iso8601(2),
+    source_url: SOURCE_URL
   }
 
   puts JSON.dump(datum) 

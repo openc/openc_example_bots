@@ -1,9 +1,7 @@
 {
  "bot_id": "basic_scraper",
- "source_descriptor": "https://www.og.decc.gov.uk/information/licence_reports/companygrouplookup.html",
  "data_type": "primary data",
  "identifying_fields": ["company_name", "group_name", "source_url"],
- "executable": "basic_scraper.rb",
  "version": "0.1",
- "files": ["basic_scraper.rb"]
+ "files": ["scraper.rb"]
 }
