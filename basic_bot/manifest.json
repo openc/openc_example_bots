@@ -1,7 +1,10 @@
 {
  "bot_id": "basic_scraper",
+ "title": "DECC UK Oil Licences - Company Group Look-up Information",
+ "description": "Information about which companies own licenced oil drilling companies in the UK.",
+ "frequency": "monthly",
  "data_type": "primary data",
- "identifying_fields": ["company_name", "group_name", "source_url"],
+ "identifying_fields": ["company_name", "group_name"],
  "version": "0.1",
  "files": ["scraper.rb"]
 }

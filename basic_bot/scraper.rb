@@ -5,7 +5,6 @@
 # pages and `nokogiri` to parse and query the HTML
 require 'json'
 require 'mechanize'
-require 'nokogiri'
 
 # Setup
 # -----
@@ -15,7 +14,7 @@ require 'nokogiri'
 # and the `agent` variable is setting up Mechanize which is like
 # a mini web browser. It will fetch the page and handle things like
 # redirects and https for us, returning the HTML source as a string.
-SOURCE_URL = "https://www.og.decc.gov.uk/eng/fox/decc/PED301X/companyLookup"
+SOURCE_URL = "http://turbot.opencorporates.com/examples/basic_bot.html"
 agent = Mechanize.new
 agent.user_agent_alias = 'Mac Safari'
 
@@ -26,10 +25,9 @@ agent.user_agent_alias = 'Mac Safari'
 # we pass as an argument. This returns a string containing the HTML source 
 # of the page
 #
-# `Nokogiri.parse` changes this string into a Ruby object which we can search
+# `.parser` returns a [Nokogiri](http://nokogiri.org/) document which we can search
 # with CSS or XPath selectors (just like the ones in jQuery)
-page = agent.get(SOURCE_URL)
-doc = Nokogiri.parse(page.body)
+doc = agent.get(SOURCE_URL).parser
 
 
 # Extracting the data
@@ -38,11 +36,10 @@ doc = Nokogiri.parse(page.body)
 # _WATCH OUT_ because CSS queries in Nokogiri are case sensitive
 #
 # We'll pull out all the rows from the table and put their `td` cells into an array.
-# To keep things simple we'll setup our empty array to capture the output and we should
+# `map` is like `each` but it returns an array of results at the end. We should
 # end up with an array of arrays, one for each row of the table.
-output = []
-doc.css('.setoutList tr').each do |row| 
-  output << row.css('td').map {|r| r.text }
+output = doc.css('.setoutList tr').map do |row| 
+  row.css('td').map {|r| r.text }
 end
 
 # Outputting the data
@@ -58,8 +55,8 @@ end
 output.each do |row|
   datum = {
     company_name: row[0], 
-    company_number: row[1],
-    sample_date: Time.now.iso8601(2),
+    group_name: row[1],
+    sample_date: Time.now,
     source_url: SOURCE_URL
   }
 
