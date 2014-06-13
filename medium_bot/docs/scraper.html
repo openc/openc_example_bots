@@ -116,7 +116,7 @@ the <code>parse_results_page</code> method.</p>
     url = <span class="hljs-constant">BASE_URL</span> + <span class="hljs-string">"listofawarded-contracts.html?start=<span class="hljs-subst">#{start_notice}</span>"</span>
     page = <span class="hljs-constant">HTTPClient</span>.new.get_content(url)
     <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> page[<span class="hljs-regexp">/No matches were found/</span>]
-    results = parse_results_page(page)
+    results = parse_results_page(page, url)
     results.each <span class="hljs-keyword">do</span> |result_hash|</pre></div></div>
             
         </li>
@@ -163,7 +163,7 @@ the <code>parse_results_page</code> method.</p>
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>parse_results_page(page)
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>parse_results_page(page, source_url)
   doc = <span class="hljs-constant">Nokogiri::HTML</span>(page)</pre></div></div>
             
         </li>
@@ -242,11 +242,7 @@ Here we record that url for future bots to process at a later date.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      hsh[<span class="hljs-string">"<span class="hljs-subst">#{headings[i]}</span>_url"</span>] = (<span class="hljs-constant">BASE_URL</span> + td.at(<span class="hljs-string">'a'</span>)[<span class="hljs-symbol">:href</span>]) <span class="hljs-keyword">if</span> td.at(<span class="hljs-string">'a'</span>)
-      hsh
-    <span class="hljs-keyword">end</span>
-  <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">end</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      hsh[<span class="hljs-string">"<span class="hljs-subst">#{headings[i]}</span>_url"</span>] = (<span class="hljs-constant">BASE_URL</span> + td.at(<span class="hljs-string">'a'</span>)[<span class="hljs-symbol">:href</span>]) <span class="hljs-keyword">if</span> td.at(<span class="hljs-string">'a'</span>)</pre></div></div>
             
         </li>
         
@@ -257,9 +253,17 @@ Here we record that url for future bots to process at a later date.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <h2 id="running-the-scraper">Running the scraper</h2>
+              <p><code>source_url</code> and <code>sample_date</code> are required fields for Turbot. We use these
+to display a provenance for every single piece of data on OpenCorporates.com</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>      hsh[<span class="hljs-string">'source_url'</span>] = source_url
+      hsh[<span class="hljs-string">'sample_date'</span>] = <span class="hljs-constant">Time</span>.now
+      hsh
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span></pre></div></div>
             
         </li>
         
@@ -269,6 +273,19 @@ Here we record that url for future bots to process at a later date.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <h2 id="running-the-scraper">Running the scraper</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>As this is executed as a single Ruby file, we need to make sure we call some methods!
 We’ll use an old convention from C programming and wrap the work in a main method, which
@@ -283,11 +300,11 @@ is then run straight away.</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Here’s where the magic happens.</p>
 

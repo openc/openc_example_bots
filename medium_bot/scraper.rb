@@ -16,7 +16,9 @@ require 'httpclient'
 # There are a number of helper methods covering text, csv, dates and more.
 require 'openc_bot/helpers/text'
 
-BASE_URL = 'http://ppda.go.ug/tenderportal/'
+# The original source is here  - 'http://ppda.go.ug/tenderportal/'
+# We'll use an OpenCorporates hosted copy of the source for the example
+BASE_URL = 'http://turbot.opencorporates.com/examples/'
 
 # Fetching the data
 # -----------------
@@ -27,10 +29,10 @@ BASE_URL = 'http://ppda.go.ug/tenderportal/'
 def get_all_notices
   start_notice = 0
   loop do
-    url = BASE_URL + "listofawarded-contracts.html?start=#{start_notice}"
+    url = BASE_URL + "medium_bot_start=#{start_notice}.html"
     page = HTTPClient.new.get_content(url)
     break if page[/No matches were found/]
-    results = parse_results_page(page)
+    results = parse_results_page(page, url)
     results.each do |result_hash|
       # We then print the resultant hashes out as JSON.
       puts JSON.dump(result_hash)
@@ -42,7 +44,7 @@ end
 # Extracting the data
 # -------------------
 #
-def parse_results_page(page)
+def parse_results_page(page, source_url)
   doc = Nokogiri::HTML(page)
   # In this case the data we want is in an HTML table
   table_rows = doc.search('table#tenderlisttop tr').to_a.select { |tr| tr.at('td') }
@@ -57,6 +59,10 @@ def parse_results_page(page)
       # The data also contains links to a full text version of the tender notice.
       # Here we record that url for future bots to process at a later date.
       hsh["#{headings[i]}_url"] = (BASE_URL + td.at('a')[:href]) if td.at('a')
+      # `source_url` and `sample_date` are required fields for Turbot. We use these
+      # to display a provenance for every single piece of data on OpenCorporates.com
+      hsh['source_url'] = source_url
+      hsh['sample_date'] = Time.now
       hsh
     end
   end
