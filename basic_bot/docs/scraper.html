@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>basic_scraper.rb</title>
+  <title>scraper.rb</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -15,7 +15,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>basic_scraper.rb</h1>
+                  <h1>scraper.rb</h1>
               </div>
           </li>
         
@@ -47,8 +47,7 @@ pages and <code>nokogiri</code> to parse and query the HTML</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">require</span> <span class="hljs-string">'json'</span>
-<span class="hljs-keyword">require</span> <span class="hljs-string">'mechanize'</span>
-<span class="hljs-keyword">require</span> <span class="hljs-string">'nokogiri'</span></pre></div></div>
+<span class="hljs-keyword">require</span> <span class="hljs-string">'mechanize'</span></pre></div></div>
             
         </li>
         
@@ -80,7 +79,7 @@ redirects and https for us, returning the HTML source as a string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-constant">SOURCE_URL</span> = <span class="hljs-string">"https://www.og.decc.gov.uk/eng/fox/decc/PED301X/companyLookup"</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-constant">SOURCE_URL</span> = <span class="hljs-string">"http://turbot.opencorporates.com/examples/basic_bot.html"</span>
 agent = <span class="hljs-constant">Mechanize</span>.new
 agent.user_agent_alias = <span class="hljs-string">'Mac Safari'</span></pre></div></div>
             
@@ -109,13 +108,12 @@ agent.user_agent_alias = <span class="hljs-string">'Mac Safari'</span></pre></di
               <p><code>agent.get</code> tells Mechanize to retrieve the page for whichever url
 we pass as an argument. This returns a string containing the HTML source 
 of the page</p>
-<p><code>Nokogiri.parse</code> changes this string into a Ruby object which we can search
+<p><code>.parser</code> returns a <a href="http://nokogiri.org/">Nokogiri</a> document which we can search
 with CSS or XPath selectors (just like the ones in jQuery)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>page = agent.get(<span class="hljs-constant">SOURCE_URL</span>)
-doc = <span class="hljs-constant">Nokogiri</span>.parse(page.body)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>doc = agent.get(<span class="hljs-constant">SOURCE_URL</span>).parser</pre></div></div>
             
         </li>
         
@@ -142,14 +140,13 @@ doc = <span class="hljs-constant">Nokogiri</span>.parse(page.body)</pre></div></
               <p>In this page, the data we want is in an HTML table with a class <code>.setoutList</code>
 <em>WATCH OUT</em> because CSS queries in Nokogiri are case sensitive</p>
 <p>We’ll pull out all the rows from the table and put their <code>td</code> cells into an array.
-To keep things simple we’ll setup our empty array to capture the output and we should
+<code>map</code> is like <code>each</code> but it returns an array of results at the end. We should
 end up with an array of arrays, one for each row of the table.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>output = []
-doc.css(<span class="hljs-string">'.setoutList tr'</span>).each <span class="hljs-keyword">do</span> |row| 
-  output &lt;&lt; row.css(<span class="hljs-string">'td'</span>).map {|r| r.text }
+            <div class="content"><div class='highlight'><pre>output = doc.css(<span class="hljs-string">'.setoutList tr'</span>).map <span class="hljs-keyword">do</span> |row| 
+  row.css(<span class="hljs-string">'td'</span>).map {|r| r.text }
 <span class="hljs-keyword">end</span></pre></div></div>
             
         </li>
@@ -187,7 +184,9 @@ JSON friendly string, suitable for printing out.</p>
             <div class="content"><div class='highlight'><pre>output.each <span class="hljs-keyword">do</span> |row|
   datum = {
     <span class="hljs-symbol">company_name:</span> row[<span class="hljs-number">0</span>], 
-    <span class="hljs-symbol">company_number:</span> row[<span class="hljs-number">1</span>]
+    <span class="hljs-symbol">group_name:</span> row[<span class="hljs-number">1</span>],
+    <span class="hljs-symbol">sample_date:</span> <span class="hljs-constant">Time</span>.now,
+    <span class="hljs-symbol">source_url:</span> <span class="hljs-constant">SOURCE_URL</span>
   }
 
   puts <span class="hljs-constant">JSON</span>.dump(datum) 
