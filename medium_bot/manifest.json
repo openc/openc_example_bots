@@ -1,5 +1,8 @@
 {
  "bot_id": "medium_bot",
+ "title": "Uganda Public Procurement Disposal of Public Assets Authority",
+ "description": "List of public contracts awarded by the Uganda to companies.",
+ "frequency": "monthly",
  "data_type": "primary data",
  "identifying_fields": ["reference_no"],
  "version": "0.1",
