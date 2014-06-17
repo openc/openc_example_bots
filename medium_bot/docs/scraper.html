@@ -54,14 +54,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Load any gems you need first. Here we’ll use <code>chronic</code> for date parsing,
-<code>httpclient</code> and <code>nokogiri</code> to fetch and query the html pages and some 
-helper methods from the <code>openc_bot</code> gem maintained by OpenCorporates.</p>
+              <p>Load any gems you need first. Here we’ll use <code>httpclient</code> and <code>nokogiri</code> 
+to fetch and query the html pages and some helper methods from the <code>openc_bot</code> 
+gem maintained by OpenCorporates.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">require</span> <span class="hljs-string">'active_support/core_ext'</span>
-<span class="hljs-keyword">require</span> <span class="hljs-string">'chronic'</span>
 <span class="hljs-keyword">require</span> <span class="hljs-string">'nokogiri'</span>
 <span class="hljs-keyword">require</span> <span class="hljs-string">'httpclient'</span></pre></div></div>
             
@@ -78,9 +77,7 @@ helper methods from the <code>openc_bot</code> gem maintained by OpenCorporates.
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">require</span> <span class="hljs-string">'openc_bot/helpers/text'</span>
-
-<span class="hljs-constant">BASE_URL</span> = <span class="hljs-string">'http://ppda.go.ug/tenderportal/'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">require</span> <span class="hljs-string">'openc_bot/helpers/text'</span></pre></div></div>
             
         </li>
         
@@ -91,9 +88,12 @@ helper methods from the <code>openc_bot</code> gem maintained by OpenCorporates.
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2 id="fetching-the-data">Fetching the data</h2>
+              <p>The original source is here  - ‘<a href="http://ppda.go.ug/tenderportal/">http://ppda.go.ug/tenderportal/</a>‘
+We’ll use an OpenCorporates hosted copy of the source for the example</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-constant">BASE_URL</span> = <span class="hljs-string">'http://turbot.opencorporates.com/examples/'</span></pre></div></div>
             
         </li>
         
@@ -104,20 +104,9 @@ helper methods from the <code>openc_bot</code> gem maintained by OpenCorporates.
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>In this method, we loop through pages of search results breaking the loop
-when we hit “No matches were found”. We’re passing these results pages onto
-the <code>parse_results_page</code> method.</p>
+              <h2 id="fetching-the-data">Fetching the data</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>get_all_notices
-  start_notice = <span class="hljs-number">0</span>
-  loop <span class="hljs-keyword">do</span>
-    url = <span class="hljs-constant">BASE_URL</span> + <span class="hljs-string">"listofawarded-contracts.html?start=<span class="hljs-subst">#{start_notice}</span>"</span>
-    page = <span class="hljs-constant">HTTPClient</span>.new.get_content(url)
-    <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> page[<span class="hljs-regexp">/No matches were found/</span>]
-    results = parse_results_page(page, url)
-    results.each <span class="hljs-keyword">do</span> |result_hash|</pre></div></div>
             
         </li>
         
@@ -127,6 +116,30 @@ the <code>parse_results_page</code> method.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>In this method, we loop through pages of search results breaking the loop
+when we hit “No matches were found”. We’re passing these results pages onto
+the <code>parse_results_page</code> method.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>get_all_notices
+  start_notice = <span class="hljs-number">0</span>
+  loop <span class="hljs-keyword">do</span>
+    url = <span class="hljs-constant">BASE_URL</span> + <span class="hljs-string">"medium_bot_start=<span class="hljs-subst">#{start_notice}</span>.html"</span>
+    page = <span class="hljs-constant">HTTPClient</span>.new.get_content(url)
+    <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> page[<span class="hljs-regexp">/No matches were found/</span>]
+    results = parse_results_page(page, url)
+    results.each <span class="hljs-keyword">do</span> |result_hash|</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>We then print the resultant hashes out as JSON.</p>
 
@@ -141,30 +154,15 @@ the <code>parse_results_page</code> method.</p>
         </li>
         
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
-              </div>
-              <h2 id="extracting-the-data">Extracting the data</h2>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              
+              <h2 id="extracting-the-data">Extracting the data</h2>
+
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>parse_results_page(page, source_url)
-  doc = <span class="hljs-constant">Nokogiri::HTML</span>(page)</pre></div></div>
             
         </li>
         
@@ -175,11 +173,11 @@ the <code>parse_results_page</code> method.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>In this case the data we want is in an HTML table</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>  table_rows = doc.search(<span class="hljs-string">'table#tenderlisttop tr'</span>).to_a.select { |tr| tr.at(<span class="hljs-string">'td'</span>) }</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> </span>parse_results_page(page, source_url)
+  doc = <span class="hljs-constant">Nokogiri::HTML</span>(page)</pre></div></div>
             
         </li>
         
@@ -189,6 +187,21 @@ the <code>parse_results_page</code> method.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>In this case the data we want is in an HTML table</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  table_rows = doc.search(<span class="hljs-string">'table#tenderlisttop tr'</span>).to_a.select { |tr| tr.at(<span class="hljs-string">'td'</span>) }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>We take the cells from the first row as headers, normalising them to <code>snake_case</code>. 
 These will be used as hash keys later on.</p>
@@ -200,11 +213,11 @@ These will be used as hash keys later on.</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>We then work through the rest of the rows, building a <code>key =&gt; value</code> hash based on the column headers.</p>
 
@@ -216,11 +229,11 @@ These will be used as hash keys later on.</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Here we are using helpers from the <a href="https://github.com/openc/openc_bot">OpenCorporates <code>openc_bot</code> gem</a>.</p>
 
@@ -231,11 +244,11 @@ These will be used as hash keys later on.</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>The data also contains links to a full text version of the tender notice.
 Here we record that url for future bots to process at a later date.</p>
@@ -247,11 +260,11 @@ Here we record that url for future bots to process at a later date.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p><code>source_url</code> and <code>sample_date</code> are required fields for Turbot. We use these
 to display a provenance for every single piece of data on OpenCorporates.com</p>
@@ -268,11 +281,11 @@ to display a provenance for every single piece of data on OpenCorporates.com</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <h2 id="running-the-scraper">Running the scraper</h2>
 
@@ -281,11 +294,11 @@ to display a provenance for every single piece of data on OpenCorporates.com</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>As this is executed as a single Ruby file, we need to make sure we call some methods!
 We’ll use an old convention from C programming and wrap the work in a main method, which
@@ -300,11 +313,11 @@ is then run straight away.</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Here’s where the magic happens.</p>
 

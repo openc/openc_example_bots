@@ -6,11 +6,10 @@
 # Prerequisites
 # -------------
 #
-# Load any gems you need first. Here we'll use `chronic` for date parsing,
-# `httpclient` and `nokogiri` to fetch and query the html pages and some 
-# helper methods from the `openc_bot` gem maintained by OpenCorporates.
+# Load any gems you need first. Here we'll use `httpclient` and `nokogiri` 
+# to fetch and query the html pages and some helper methods from the `openc_bot` 
+# gem maintained by OpenCorporates.
 require 'active_support/core_ext'
-require 'chronic'
 require 'nokogiri'
 require 'httpclient'
 # There are a number of helper methods covering text, csv, dates and more.
