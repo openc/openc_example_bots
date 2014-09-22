@@ -1,0 +1,17 @@
+{
+  "bot_id": "us_massachusetts_business_licenses",
+  "title": "US Massachusetts business licenses",
+  "description": "Scrapes raw business license info from the website of the Office of Consumer Affairs and Business Regulation in Massachusetts, USA",
+  "language": "python",
+  "data_type": "primary data",
+  "identifying_fields": [
+    "license_number"
+  ],
+  "files": ["scraper.py", "licence_transformer.py"],
+  "transformers": [{
+    "file":  "licence_transformer.py",
+    "data_type": "simple-licence",
+    "identifying_fields": ["license_number"]
+  }],
+  "frequency": "monthly"
+}

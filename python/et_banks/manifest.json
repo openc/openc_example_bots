@@ -1,0 +1,10 @@
+{
+ "bot_id": "et_banks",
+ "title": "List of Banks Licensed in Ethiopia",
+ "description": "A list of all licensed banks in Ethiopia from the web site of the National Bank of Ethopia",
+ "data_type": "primary data",
+ "identifying_fields": ["name"],
+ "files": ["scraper.py"],
+ "frequency": "monthly",
+ "language": "python"
+}
